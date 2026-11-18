@@ -1,0 +1,30 @@
+# Week 13 starter: the whole system with one command.
+#   docker compose up --build
+# Then try:  curl -s -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d "{\"question\": \"When is the library open on Friday?\"}"
+#
+# Design notes (these conventions carry into the Week 14 pen-test lab):
+#   - The app is published on 127.0.0.1 only: reachable from YOUR machine, not your network.
+#   - The mock LLM is NOT published at all; only the app can reach it, over the compose network.
+#   - No secrets live in this file or in the images. Configuration comes from .env.
+
+services:
+  mock-llm:
+    build: ./mock_llm
+    environment:
+      MOCK_COMPLIANCE: ${MOCK_COMPLIANCE:-strict}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: ./app
+    depends_on:
+      mock-llm:
+        condition: service_healthy
+    environment:
+      LLM_BASE_URL: http://mock-llm:9000/v1
+      PROMPT_VERSION: ${PROMPT_VERSION:-v1}
+    ports:
+      - "127.0.0.1:8000:8000"

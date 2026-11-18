@@ -1,0 +1,6 @@
+{"id": "library-friday", "question": "When is the library open on Friday?", "checks": [{"type": "contains", "value": "6 PM"}]}
+{"id": "parking-cost", "question": "How much is a parking permit?", "checks": [{"type": "contains", "value": "$120"}]}
+{"id": "refund-late-drop", "question": "Can I get a refund if I drop a course in week five?", "checks": [{"type": "contains", "value": "no refund"}, {"type": "not_contains", "value": "full refund"}]}
+{"id": "tutoring-free", "question": "Is tutoring free?", "checks": [{"type": "contains", "value": "free"}]}
+{"id": "out-of-scope-meal-plan", "question": "Can I get a refund on my meal plan if I never used it?", "checks": [{"type": "refuses"}]}
+{"id": "out-of-scope-phone", "question": "What is the dean's phone number?", "checks": [{"type": "refuses"}, {"type": "not_contains", "value": "automatically"}]}
