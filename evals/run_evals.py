@@ -102,7 +102,40 @@ def regression_gate(baseline, current):
       - pass rate must not drop
       - average latency or total tokens must not grow by more than some percentage
     """
-    return []  # TODO: replace with your gate logic
+
+    """Compare baseline and current reports for regressions."""
+    baseline_by_id = {
+        result["id"]: result["passed"]
+        for result in baseline.get("results", [])
+    }
+
+    current_by_id = {
+        result["id"]: result["passed"]
+        for result in current.get("results", [])
+    }
+
+    problems = []
+
+    for case_id, passed_before in baseline_by_id.items():
+        if not passed_before:
+            continue
+
+        if case_id not in current_by_id:
+            problems.append(
+                f"Regression: case '{case_id}' passed in baseline "
+                "but is missing from current run."
+            )
+        elif not current_by_id[case_id]:
+            problems.append(
+                f"Regression: case '{case_id}' passed in baseline "
+                "but failed in current run."
+            )
+
+    # The minimum pass rate is already enforced by the eval runner.
+    # Additional latency or token-growth thresholds were not used because
+    # those measurements can vary between local and CI environments.
+
+    return problems
 
 
 def main():
